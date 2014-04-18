@@ -70,6 +70,7 @@ public class ProcessingController {
 
         LOG.debug("{}: Start non-blocking request #{}, processing time: {} ms.", concReqs, reqId, processingTimeMs);
 
+        // Create the deferredResult and initiate a callback object, task, with it
         DeferredResult<ProcessingStatus> deferredResult = new DeferredResult<>();
         ProcessingTask task = new ProcessingTask(reqId, concurrentRequests, processingTimeMs, deferredResult);
 
