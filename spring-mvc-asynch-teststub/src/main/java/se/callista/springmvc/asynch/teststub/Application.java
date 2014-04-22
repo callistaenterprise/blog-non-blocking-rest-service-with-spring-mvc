@@ -1,4 +1,4 @@
-package se.callista.websocketlabs.springmvc.asynch.teststub;
+package se.callista.springmvc.asynch.teststub;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

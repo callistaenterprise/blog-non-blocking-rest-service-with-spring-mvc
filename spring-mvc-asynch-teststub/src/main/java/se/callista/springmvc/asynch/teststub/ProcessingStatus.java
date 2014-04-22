@@ -1,4 +1,4 @@
-package se.callista.websocketlabs.springmvc.asynch.teststub;
+package se.callista.springmvc.asynch.teststub;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

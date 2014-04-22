@@ -1,4 +1,4 @@
-package se.callista.websocketlabs.springmvc.asynch.teststub;
+package se.callista.springmvc.asynch.teststub;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;

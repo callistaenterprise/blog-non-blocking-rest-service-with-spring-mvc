@@ -15,7 +15,7 @@
     </encoder>
   </appender>
 
-  <logger name="se.callista.websocketlabs.springmvc.asynch.teststub" level="INFO"/>
+  <logger name="se.callista.springmvc.asynch.teststub" level="INFO"/>
   
   <root level="INFO">
     <appender-ref ref="stdout"/>

@@ -1,4 +1,4 @@
-package se.callista.websocketlabs.springmvc.asynch.teststub;
+package se.callista.springmvc.asynch.teststub;
 
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
