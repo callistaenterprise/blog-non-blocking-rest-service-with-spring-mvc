@@ -43,7 +43,14 @@ public class RouterController {
 
     @Value("${statistics.requestsPerLog}")
     private int STAT_REQS_PER_LOG;
-    
+
+    /**
+     * curl "http://localhost:9080/route-blocking?minMs=1000&maxMs=2000"
+     *
+     * @param minMs
+     * @param maxMs
+     * @return
+     */
     @RequestMapping("/route-blocking")
     public String blockingRouter(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
@@ -72,6 +79,14 @@ public class RouterController {
         }
     }
 
+    /**
+     * curl "http://localhost:9080/route-non-blocking?minMs=1000&maxMs=2000"
+     *
+     * @param minMs
+     * @param maxMs
+     * @return
+     * @throws IOException
+     */
     @RequestMapping("/route-non-blocking")
     public DeferredResult<String> nonBlockingRouter(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,

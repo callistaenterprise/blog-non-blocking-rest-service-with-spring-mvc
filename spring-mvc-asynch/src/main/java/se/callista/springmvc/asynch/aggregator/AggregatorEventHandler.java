@@ -35,7 +35,7 @@ public class AggregatorEventHandler {
 
     public void onStart() {
         try {
-            for...
+// FIXME. ML           for...
 
             asyncHttpClient.prepareGet(SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs).execute(
                 new AggregatorCallback(this));
@@ -43,7 +43,7 @@ public class AggregatorEventHandler {
             throw new RuntimeException(e);
         }
 
-        kickoff a timer as well + konfiguration...
+// FIXME. ML        kickoff a timer as well + konfiguration...
     }
 
     public void onResult(Response response) {
@@ -54,10 +54,10 @@ public class AggregatorEventHandler {
         int httpStatus = response.getStatusCode();
 
         if (deferredResult.isSetOrExpired()) {
-            LOG.warn("{}: Processing of non-blocking routing #{} already expired", concReqs, reqId);
+// FIXME. ML            LOG.warn("{}: Processing of non-blocking routing #{} already expired", concReqs, reqId);
         } else {
-            boolean deferredStatus = deferredResult.setResult(response.getResponseBody());
-            LOG.debug("{}: Processing of non-blocking routing #{} done, http-status = {}, deferredStatus = {}", concReqs, reqId, httpStatus, deferredStatus);
+// FIXME. ML            boolean deferredStatus = deferredResult.setResult(response.getResponseBody());
+// FIXME. ML            LOG.debug("{}: Processing of non-blocking routing #{} done, http-status = {}, deferredStatus = {}", concReqs, reqId, httpStatus, deferredStatus);
         }
 
     }
@@ -69,7 +69,7 @@ public class AggregatorEventHandler {
         // TODO: Handle asynchronous processing errors...
 
         if (deferredResult.isSetOrExpired()) {
-            LOG.warn("{}: Processing of non-blocking routing #{} caused an exception: {}", concReqs, reqId, t);
+// FIXME. ML            LOG.warn("{}: Processing of non-blocking routing #{} caused an exception: {}", concReqs, reqId, t);
         }
     }
 
