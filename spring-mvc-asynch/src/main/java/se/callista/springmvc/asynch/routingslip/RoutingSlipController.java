@@ -1,19 +1,13 @@
 package se.callista.springmvc.asynch.routingslip;
 
-import com.ning.http.client.AsyncHttpClient;
 import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.routingslip.statemachine.State;
 import se.callista.springmvc.asynch.routingslip.statemachine.StateMachine;
@@ -22,7 +16,6 @@ import se.callista.springmvc.asynch.routingslip.util.DeferredResultWithBlockingW
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
