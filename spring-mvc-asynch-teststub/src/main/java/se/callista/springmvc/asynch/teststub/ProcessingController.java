@@ -29,6 +29,13 @@ public class ProcessingController {
     @Value("${statistics.requestsPerLog}")
     private int STAT_REQS_PER_LOG;
 
+    /**
+     * Sample usage: curl "http://localhost:9090/process-blocking?minMs=1000&maxMs=2000"
+     *
+     * @param minMs
+     * @param maxMs
+     * @return
+     */
     @RequestMapping("/process-blocking")
     public ProcessingStatus blockingProcessing(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
@@ -56,6 +63,13 @@ public class ProcessingController {
         return new ProcessingStatus("Ok", processingTimeMs);
     }
 
+    /**
+     * Sample usage: curl "http://localhost:9090/process-non-blocking?minMs=1000&maxMs=2000"
+     *
+     * @param minMs
+     * @param maxMs
+     * @return
+     */
     @RequestMapping("/process-non-blocking")
     public DeferredResult<ProcessingStatus> nonBlockingProcessing(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
