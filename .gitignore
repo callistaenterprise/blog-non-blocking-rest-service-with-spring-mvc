@@ -15,6 +15,7 @@
 .idea
 local.properties
 *.iml
+out
 
 # Gradle files #
 .gradle

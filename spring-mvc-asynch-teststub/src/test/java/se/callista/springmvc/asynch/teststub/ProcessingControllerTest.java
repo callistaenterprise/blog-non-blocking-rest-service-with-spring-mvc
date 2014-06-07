@@ -30,8 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class ProcessingControllerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProcessingControllerTest.class);
-
     @Autowired
     ProcessingController customerController;
 

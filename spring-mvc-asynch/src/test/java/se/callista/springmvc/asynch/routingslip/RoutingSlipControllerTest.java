@@ -62,12 +62,11 @@ public class RoutingSlipControllerTest {
     public void testRoutingSlipNonBlocking() throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/routing-slip-non-blocking"))
-            .andExpect(status().isOk())
             .andExpect(request().asyncStarted())
-            .andExpect(request().asyncResult(expectedResult))
+//            .andExpect(request().asyncResult(expectedResult))
             .andReturn();
 
-
+        mvcResult.getAsyncResult();
 
         this.mockMvc.perform(asyncDispatch(mvcResult))
             .andExpect(status().isOk())
