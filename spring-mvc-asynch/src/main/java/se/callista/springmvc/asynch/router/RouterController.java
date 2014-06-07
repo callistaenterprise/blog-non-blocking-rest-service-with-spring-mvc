@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,27 +22,31 @@ import org.springframework.web.context.request.async.DeferredResult;
 import com.ning.http.client.AsyncHttpClient;
 import com.sun.management.UnixOperatingSystemMXBean;
 import se.callista.springmvc.asynch.util.LogHelper;
+import se.callista.springmvc.asynch.util.LogHelperFactory;
+
+import javax.annotation.PostConstruct;
 
 @RestController
 public class RouterController {
 
-    private final LogHelper LOG;
+    private LogHelper LOG;
 
     private RestTemplate      restTemplate       = new RestTemplate();
     private AsyncRestTemplate asyncRestTemplate  = new AsyncRestTemplate();
     private AsyncHttpClient   asyncHttpClient    = new AsyncHttpClient();
-    
+
+    @Autowired
+    private LogHelperFactory logFactory;
+
     @Value("${sp.blocking.url}")
     private String SP_BLOCKING_URL;
 
     @Value("${sp.non_blocking.url}")
     private String SP_NON_BLOCKING_URL;
 
-    @Value("${statistics.requestsPerLog}")
-    private int STAT_REQS_PER_LOG;
-
-    private RouterController() {
-        LOG = new LogHelper(RouterController.class, "router", STAT_REQS_PER_LOG);
+    @PostConstruct
+    public void initAfterInject() {
+        LOG = logFactory.getLog(RouterController.class, "router");
     }
 
     /**
