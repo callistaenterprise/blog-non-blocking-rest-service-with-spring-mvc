@@ -32,7 +32,7 @@ public class AsynchProcessor implements Processor {
     public void process(State state) {
 
         try {
-            int sleeptimeMs = 100 * (state.sequenceNo);
+            int sleeptimeMs = 100 * (state.getProcessingStepNo());
             String url = SP_NON_BLOCKING_URL + "?minMs=" + sleeptimeMs + "&maxMs=" + sleeptimeMs;
 
             LOG.debug("Launch asynch call");

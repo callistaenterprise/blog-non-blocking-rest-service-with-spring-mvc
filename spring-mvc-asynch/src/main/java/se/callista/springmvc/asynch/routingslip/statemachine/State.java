@@ -1,7 +1,8 @@
 package se.callista.springmvc.asynch.routingslip.statemachine;
 
-import org.springframework.web.context.request.async.DeferredResult;
+import se.callista.springmvc.asynch.util.LogHelper;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -9,25 +10,56 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class State {
 
-    public enum ProcessType { SYNCH_PROCESS, ASYNCH_PROCESS };
+    private static final AtomicLong lastProcessId = new AtomicLong(0);
 
-    public ProcessType processType;
-    public int sequenceNo;
+    private Iterator<Processor> processingSteps;
+    private int processingStepNo;
+    private long processId;
+    private LogHelper log;
+    private StateMachineCallback completionCallback;
+    private String result;
 
-    public DeferredResult<String> deferredResult;
-    public String temporaryResult;
+    public State(Iterator<Processor> processingSteps, LogHelper log, StateMachineCallback completionCallback) {
+        this.processingSteps = processingSteps;
+        this.log = log;
+        this.completionCallback = completionCallback;
 
-    public long reqId;
-    public AtomicLong concurrentRequests;
-
-    public State(ProcessType processType, long reqId, DeferredResult<String> deferredResult, AtomicLong concurrentRequests) {
-        this.processType = processType;
-        this.sequenceNo = 0;
-
-        this.deferredResult = deferredResult;
-        this.temporaryResult = "";
-
-        this.reqId = reqId;
-        this.concurrentRequests = concurrentRequests;
+        this.processingStepNo = 0;
+        this.processId = lastProcessId.incrementAndGet();
+        this.result = "";
     }
+
+    public Iterator<Processor> getProcessingSteps() {
+        return processingSteps;
+    }
+
+    public int getProcessingStepNo() {
+        return processingStepNo;
+    }
+
+    public long getProcessId() {
+        return processId;
+    }
+
+    public LogHelper getLog() {
+        return log;
+    }
+
+    public StateMachineCallback getCompletionCallback() {
+        return completionCallback;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public int incrementProcessingStepNo() {
+        return ++processingStepNo;
+    }
+
+    public String appendResult(String newResult) {
+        return result += newResult;
+
+    }
+
 }

@@ -20,16 +20,12 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.sun.management.UnixOperatingSystemMXBean;
+import se.callista.springmvc.asynch.util.LogHelper;
 
 @RestController
 public class RouterController {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(RouterController.class);
 
-    private static OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-    private static final AtomicLong lastRequestId = new AtomicLong(0);
-    private static final AtomicLong concurrentRequests = new AtomicLong(0);
-    private static long maxConcurrentRequests = 0;
+    private final LogHelper LOG;
 
     private RestTemplate      restTemplate       = new RestTemplate();
     private AsyncRestTemplate asyncRestTemplate  = new AsyncRestTemplate();
@@ -44,8 +40,12 @@ public class RouterController {
     @Value("${statistics.requestsPerLog}")
     private int STAT_REQS_PER_LOG;
 
+    private RouterController() {
+        LOG = new LogHelper(RouterController.class, "router", STAT_REQS_PER_LOG);
+    }
+
     /**
-     * curl "http://localhost:9080/route-blocking?minMs=1000&maxMs=2000"
+     * Sample usage: curl "http://localhost:9080/route-blocking?minMs=1000&maxMs=2000"
      *
      * @param minMs
      * @param maxMs
@@ -57,12 +57,8 @@ public class RouterController {
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) {
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        long reqId = lastRequestId.getAndIncrement();
-        long concReqs = concurrentRequests.getAndIncrement();
-        
-        updateStatistics(reqId, concReqs);
-        
-        LOG.debug("{}: Start blocking routing #{}", concReqs, reqId);
+
+        LOG.logStartBlocking();
 
         try {
             ResponseEntity<String> result = restTemplate.getForEntity(
@@ -74,13 +70,12 @@ public class RouterController {
             return result.getBody();
 
         } finally {
-            concurrentRequests.decrementAndGet();
-            LOG.debug("{}: Routing of blocking request #{} is done, status: {}", concReqs, reqId, status);        
+            LOG.logEndBlocking(status.value());
         }
     }
 
     /**
-     * curl "http://localhost:9080/route-non-blocking?minMs=1000&maxMs=2000"
+     * Sample usage: curl "http://localhost:9080/route-non-blocking?minMs=1000&maxMs=2000"
      *
      * @param minMs
      * @param maxMs
@@ -92,36 +87,18 @@ public class RouterController {
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) throws IOException {
 
-        long reqId = lastRequestId.getAndIncrement();
-        long concReqs = concurrentRequests.getAndIncrement();
-        
-        updateStatistics(reqId, concReqs);
 
-        LOG.debug("{}: Start non-blocking routing #{}.", concReqs, reqId);
+        LOG.logStartNonBlocking();
 
         DeferredResult<String> deferredResult = new DeferredResult<String>();
 
         asyncHttpClient.prepareGet(SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs).execute(
-            new RouterCallback(reqId, concurrentRequests, deferredResult));
+            new RouterCallback(LOG, deferredResult));
 
-        LOG.debug("{}: Processing of non-blocking routing #{} leave the request thread", concReqs, reqId);
+        LOG.logLeaveThreadNonBlocking();
 
         // Return to let go of the precious thread we are holding on to...
         return deferredResult;
-    }
-
-    private void updateStatistics(long reqId, long concReqs) {
-        if (concReqs > maxConcurrentRequests) {
-            maxConcurrentRequests = concReqs;
-        }
-        
-        if (reqId % STAT_REQS_PER_LOG == 0 && reqId > 0) {
-            Object openFiles = "UNKNOWN";
-            if (os instanceof UnixOperatingSystemMXBean) {
-                openFiles = ((UnixOperatingSystemMXBean) os).getOpenFileDescriptorCount();
-            }
-            LOG.info("Statistics: noOfReqs: {}, maxConcReqs: {}, openFiles: {}", reqId, maxConcurrentRequests, openFiles);
-        }
     }
 
     /**
@@ -141,9 +118,7 @@ public class RouterController {
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) throws IOException {
 
-        long reqId = lastRequestId.getAndIncrement();
-        
-        LOG.debug("Start non-blocking routing #{}.", reqId);
+        LOG.logStartNonBlocking();
 
         DeferredResult<String> deferredResult = new DeferredResult<String>();
 
@@ -151,9 +126,9 @@ public class RouterController {
             SP_NON_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);        
 
         // Register a callback for the completion of the asynchronous rest call
-        futureEntity.addCallback(new RouterCallback_Spring_AsyncRestTemplate(reqId, deferredResult));
+        futureEntity.addCallback(new RouterCallback_Spring_AsyncRestTemplate(LOG, deferredResult));
 
-        LOG.debug("Processing of non-blocking routing #{} leave the request thread", reqId);
+        LOG.logLeaveThreadNonBlocking();
 
         // Return to let go of the precious thread we are holding on to...
         return deferredResult;

@@ -31,7 +31,7 @@ public class SynchProcessor implements Processor {
     @Override
     public void process(State state) {
 
-        int sleeptimeMs = 100 * (state.sequenceNo);
+        int sleeptimeMs = 100 * (state.getProcessingStepNo());
         String url = SP_BLOCKING_URL + "?minMs=" + sleeptimeMs + "&maxMs=" + sleeptimeMs;
 
         LOG.debug("Launch synch call");
@@ -43,7 +43,8 @@ public class SynchProcessor implements Processor {
         HttpStatus status = result.getStatusCode();
 
         LOG.debug("Synch call complete, hand over to the state machine for the next action");
-        state.temporaryResult += result.getBody() + '\n';
-        stateMachine.processStateComplete(state);
+        state.appendResult(result.getBody() + '\n');
+        stateMachine.executeNextStep(state);
     }
 }
+
