@@ -34,7 +34,10 @@ public class AggregatorControllerTest {
     @Autowired
     WebApplicationContext wac;
 
-    private final String expectedResult = "{\"status\":\"Ok\",\"processingTimeMs\":2000}";
+    private final String expectedResult =
+        "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n" +
+        "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n" +
+        "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n";
 
     @Before
     public void setup(){

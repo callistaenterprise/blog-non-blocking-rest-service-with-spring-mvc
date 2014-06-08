@@ -13,10 +13,12 @@ public class DbLookupRunnable implements Runnable {
     private final int maxMs;
     private final int minMs;
     private DeferredResult<String> deferredResult;
+    private String url;
 
-    public DbLookupRunnable(int dbLookupMs, int dbHits, int minMs, int maxMs, DeferredResult<String> deferredResult) {
+    public DbLookupRunnable(int dbLookupMs, int dbHits, String url, int minMs, int maxMs, DeferredResult<String> deferredResult) {
         this.dbLookupMs = dbLookupMs;
         this.dbHits = dbHits;
+        this.url = url;
         this.minMs = minMs;
         this.maxMs = maxMs;
 		this.deferredResult = deferredResult;
@@ -26,23 +28,24 @@ public class DbLookupRunnable implements Runnable {
 	public void run() {
         //seconds later in another thread...
         int noOfCalls = execute();
-        new AggregatorEventHandler(noOfCalls, minMs, maxMs, deferredResult);
+        AggregatorEventHandler aeh = new AggregatorEventHandler(noOfCalls, url, minMs, maxMs, deferredResult);
+        aeh.onStart();
 	}
 
 	public int execute() {
+
+        LOG.debug("Start of blocking dbLookup");
 		int hits = simulateDbLookup();
+        LOG.debug("Processing of blocking dbLookup done");
+
 		return hits;
 	}
 	
 	protected int simulateDbLookup(){
 
-        LOG.debug("Start of blocking dbLookup");
-
         try {
             Thread.sleep(dbLookupMs);
         } catch (InterruptedException e) {}
-
-        LOG.debug("Processing of blocking dbLookup done");
 
         return dbHits;
     }

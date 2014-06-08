@@ -58,14 +58,21 @@ public class AggregatorController {
 
         LOG.debug("{}: Start blocking routing #{}", concReqs, reqId);
 
+        String aggregatedResult = "";
         try {
-            ResponseEntity<String> result = restTemplate.getForEntity(
-                SP_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);
 
-            // TODO: Handle status codes other than 200...
-            status = result.getStatusCode();
+            for (int i = 0; i < 3; i++) {
+                LOG.debug("{}: Start processing of blocking aggregation call {} in request #{}", "???", i, "???");
+                ResponseEntity<String> result = restTemplate.getForEntity(
+                        SP_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);
 
-            return result.getBody();
+                // TODO: Handle status codes other than 200...
+                status = result.getStatusCode();
+
+                aggregatedResult += result.getBody() + '\n';
+            }
+
+            return aggregatedResult;
 
         } finally {
             concurrentRequests.decrementAndGet();
@@ -89,7 +96,7 @@ public class AggregatorController {
 
         DeferredResult<String> deferredResult = new DeferredResult<String>();
 
-        dbThreadPoolExecutor.execute(new DbLookupRunnable(dbLookupMs, dbHits, minMs, maxMs, deferredResult));
+        dbThreadPoolExecutor.execute(new DbLookupRunnable(dbLookupMs, dbHits, SP_NON_BLOCKING_URL, minMs, maxMs, deferredResult));
 
         LOG.debug("{}: Processing of non-blocking aggregation #{} leave the request thread", concReqs, reqId);
 
