@@ -1,7 +1,7 @@
 package se.callista.springmvc.asynch.pattern.routingslip;
 
-import static se.callista.springmvc.asynch.pattern.routingslip.RoutingSlipController.ProcessType.ASYNCH_PROCESS;
-import static se.callista.springmvc.asynch.pattern.routingslip.RoutingSlipController.ProcessType.SYNCH_PROCESS;
+import static se.callista.springmvc.asynch.pattern.routingslip.RoutingSlipConfiguration.ProcessType.ASYNCH_PROCESS;
+import static se.callista.springmvc.asynch.pattern.routingslip.RoutingSlipConfiguration.ProcessType.SYNCH_PROCESS;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.common.deferredresult.DeferredResultStateMachineCallback;
-import se.callista.springmvc.asynch.common.processors.AsynchProcessor;
-import se.callista.springmvc.asynch.common.processors.Processor;
-import se.callista.springmvc.asynch.common.processors.SynchProcessor;
 import se.callista.springmvc.asynch.common.statemachine.*;
 import se.callista.springmvc.asynch.common.deferredresult.DeferredResultWithBlockingWait;
 import se.callista.springmvc.asynch.common.log.LogHelper;
@@ -19,15 +16,14 @@ import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @RestController
 public class RoutingSlipController {
 
-    protected enum ProcessType { SYNCH_PROCESS, ASYNCH_PROCESS }
     private LogHelper LOG;
+
+    @Autowired
+    private RoutingSlipConfiguration configuration;
 
     @Autowired
     private StateMachine stateMachine;
@@ -56,7 +52,7 @@ public class RoutingSlipController {
             final DeferredResultWithBlockingWait<String> deferredResult = new DeferredResultWithBlockingWait<>();
 
             // Kick off the processing
-            stateMachine.initProcessing(getProcessingStepsFromConfiguration(SYNCH_PROCESS), LOG, new DeferredResultStateMachineCallback(deferredResult));
+            stateMachine.initProcessing(configuration.getProcessingSteps(SYNCH_PROCESS), LOG, new DeferredResultStateMachineCallback(deferredResult));
 
             // Wait (blocking) for its completion
             deferredResult.await();
@@ -83,7 +79,7 @@ public class RoutingSlipController {
         final DeferredResult<String> deferredResult = new DeferredResult<>();
 
         // Kick off the asynch processing of a number of sequentially executed asynch processing steps
-        stateMachine.initProcessing(getProcessingStepsFromConfiguration(ASYNCH_PROCESS), LOG, new DeferredResultStateMachineCallback(deferredResult));
+        stateMachine.initProcessing(configuration.getProcessingSteps(ASYNCH_PROCESS), LOG, new DeferredResultStateMachineCallback(deferredResult));
 
         LOG.logLeaveThreadNonBlocking();
 
@@ -91,33 +87,4 @@ public class RoutingSlipController {
         return deferredResult;
     }
 
-    @Autowired
-    private AsynchProcessor asynchProcessor;
-
-    @Autowired
-    private SynchProcessor synchProcessor;
-
-    /**
-     * Simulates setting up a number of processing steps from some kind of configuration...
-     *
-     * @param processType
-     * @return
-     */
-    private Iterator<Processor> getProcessingStepsFromConfiguration(ProcessType processType) {
-
-        List<Processor> processingSteps = new ArrayList<Processor>();
-        for (int i = 0; i < 5; i++) {
-            switch (processType) {
-                case ASYNCH_PROCESS:
-                    processingSteps.add(asynchProcessor);
-                    break;
-                case SYNCH_PROCESS:
-                    processingSteps.add(synchProcessor);
-                    break;
-                default:
-                    throw new RuntimeException("Unknown process type: " + processType);
-            }
-        }
-        return processingSteps.iterator();
-    }
 }
