@@ -67,7 +67,9 @@ public class AggregatorEventHandler {
             int noOfRes = noOfResults.incrementAndGet();
 
             // Perform the aggregation...
-            result += response.getResponseBody() + '\n';
+            synchronized (result) {
+                result += response.getResponseBody() + '\n';
+            }
 
             if (noOfRes >= noOfCalls) {
                 onAllCompleted();
