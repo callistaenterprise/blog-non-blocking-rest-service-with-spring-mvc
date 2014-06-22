@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.common.deferredresult.DeferredResultStateMachineCallback;
+import se.callista.springmvc.asynch.common.processors.Processor;
 import se.callista.springmvc.asynch.common.statemachine.*;
 import se.callista.springmvc.asynch.common.deferredresult.DeferredResultWithBlockingWait;
 import se.callista.springmvc.asynch.common.log.LogHelper;
@@ -16,6 +17,7 @@ import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Iterator;
 
 @RestController
 public class RoutingSlipController {
@@ -79,7 +81,9 @@ public class RoutingSlipController {
         final DeferredResult<String> deferredResult = new DeferredResult<>();
 
         // Kick off the asynch processing of a number of sequentially executed asynch processing steps
-        stateMachine.initProcessing(configuration.getProcessingSteps(ASYNCH_PROCESS), LOG, new DeferredResultStateMachineCallback(deferredResult));
+        Iterator<Processor> processingSteps = configuration.getProcessingSteps(ASYNCH_PROCESS);
+
+        stateMachine.initProcessing(processingSteps, LOG, new DeferredResultStateMachineCallback(deferredResult));
 
         LOG.logLeaveThreadNonBlocking();
 

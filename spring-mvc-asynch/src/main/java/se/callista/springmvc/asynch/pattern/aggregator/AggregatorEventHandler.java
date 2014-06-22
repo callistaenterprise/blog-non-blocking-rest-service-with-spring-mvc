@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.request.async.DeferredResult;
+import se.callista.springmvc.asynch.common.log.LogHelper;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AggregatorEventHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AggregatorEventHandler.class);
+    private final LogHelper log;
 
 //     @Value("${sp.non_blocking.url}")
     private String SP_NON_BLOCKING_URL;
@@ -32,7 +33,8 @@ public class AggregatorEventHandler {
     private final AtomicInteger noOfResults = new AtomicInteger(0);
     private String result = "";
 
-    public AggregatorEventHandler(int noOfCalls, String url, int minMs, int maxMs, DeferredResult<String> deferredResult) {
+    public AggregatorEventHandler(LogHelper log, int noOfCalls, String url, int minMs, int maxMs, DeferredResult<String> deferredResult) {
+        this.log = log;
         this.noOfCalls = noOfCalls;
         this.SP_NON_BLOCKING_URL = url;
         this.minMs = minMs;
@@ -42,8 +44,8 @@ public class AggregatorEventHandler {
 
     public void onStart() {
         try {
-            LOG.debug("{}: Start processing of {} non-blocking aggregations in request #{}", "???", noOfCalls, "???");
             for (int i = 0; i < noOfCalls; i++) {
+                log.logStartProcessingStepNonBlocking(i);
                 String url = SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs;
                 asyncHttpClient.prepareGet(url).execute(new AggregatorCallback(i, this));
             }
@@ -59,11 +61,12 @@ public class AggregatorEventHandler {
         try {
             // TODO: Handle status codes other than 200...
             int httpStatus = response.getStatusCode();
-
-            LOG.debug("{}: Processing of non-blocking aggregation #{}.{} returned http status: {}", "???", "???", id, httpStatus);
+            log.logEndProcessingStepNonBlocking(id, httpStatus);
 
             // Count down, aggregate answer and return if all answers (also cancel timer)...
             int noOfRes = noOfResults.incrementAndGet();
+
+            // Perform the aggregation...
             result += response.getResponseBody() + '\n';
 
             if (noOfRes >= noOfCalls) {
@@ -76,7 +79,7 @@ public class AggregatorEventHandler {
 
     public void onError(int id, Throwable t) {
 
-        LOG.warn("{}: Processing of non-blocking aggregation #{}.{} caused an exception: {}", "???", "???", id,  t);
+        log.logExceptionNonBlocking(t);
 
         // Count down, aggregate answer and return if all answers (also cancel timer)...
         int noOfRes = noOfResults.incrementAndGet();
@@ -98,10 +101,10 @@ public class AggregatorEventHandler {
 
     public void onAllCompleted() {
         if (deferredResult.isSetOrExpired()) {
-            LOG.warn("{}: Processing of non-blocking aggregation #{} already expired", "???", "???");
+            log.logAlreadyExpiredNonBlocking();
         } else {
             boolean deferredStatus = deferredResult.setResult(result);
-            LOG.debug("{}: Processing of non-blocking aggregation #{} done, deferredStatus = {}", "???", "???", deferredStatus);
+            log.logEndNonBlocking(200, deferredStatus);
         }
     }
 }

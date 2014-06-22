@@ -30,9 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class ProcessingControllerTest {
 
-    @Autowired
-    ProcessingController customerController;
-
     private MockMvc mockMvc;
 
     @Autowired

@@ -38,6 +38,13 @@ public class LogHelper {
         logStart("non-blocking");
     }
 
+    public void logStartProcessingStepBlocking(int processingStepNo) {
+        logStartProcessingStep("blocking", processingStepNo);
+    }
+    public void logStartProcessingStepNonBlocking(int processingStepNo) {
+        logStartProcessingStep("non-blocking", processingStepNo);
+    }
+
     public void logAsynchProcessingStepComplete() {
 
         long concReqs = concurrentRequests.get();
@@ -45,6 +52,20 @@ public class LogHelper {
         updateStatistics(reqId, concReqs);
 
         log.debug("{}: Asynch call complete för request #{}, hand over to the state machine for the next action", concReqs, reqId);
+    }
+
+    public void logMessage(String message) {
+        long concReqs = concurrentRequests.get();
+
+        log.debug("{}: Request #{} - {}", concReqs, reqId, message);
+    }
+
+    public void logEndProcessingStepBlocking(int processingStepNo, int httpStatus) {
+        logEndProcessingStep("blocking", processingStepNo, httpStatus);
+    }
+
+    public void logEndProcessingStepNonBlocking(int processingStepNo, int httpStatus) {
+        logEndProcessingStep("non-blocking", processingStepNo, httpStatus);
     }
 
     public void logEndBlocking(int httpStatus) {
@@ -77,6 +98,9 @@ public class LogHelper {
         log.warn("{}: Processing of non-blocking {} request #{} already expired", concReqs, name, reqId);
     }
 
+    /*
+     * PRIVATE PARTS :-)
+     */
 
     protected void logStart(String type) {
 
@@ -96,6 +120,20 @@ public class LogHelper {
         } else {
             log.debug("{}: End of {} {} request #{}, http-status: {}, deferred-status: {}", concReqs, type, name, reqId, httpStatus, deferredStatus);
         }
+    }
+
+    protected void logStartProcessingStep(String type, int processingStepNo) {
+
+        long concReqs = concurrentRequests.getAndIncrement();
+
+        log.debug("{}: Start processing of {} call #{} in request #{}", concReqs, type, processingStepNo, reqId);
+    }
+
+    protected void logEndProcessingStep(String type, int processingStepNo, int httpStatus) {
+
+        long concReqs = concurrentRequests.getAndDecrement();
+
+        log.debug("{}: End of processing of {} call #{} in request #{}, http-status: {}", concReqs, type, processingStepNo, reqId, httpStatus);
     }
 
     protected void logException(String type, Throwable t) {
