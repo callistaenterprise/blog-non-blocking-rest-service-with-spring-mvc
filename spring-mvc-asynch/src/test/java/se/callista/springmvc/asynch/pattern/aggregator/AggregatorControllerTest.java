@@ -81,7 +81,10 @@ public class AggregatorControllerTest {
     @Test
     public void testAggregatorNonBlockingTimeout() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/aggregate-non-blocking?dbHits=10&minMs=2000&maxMs=5000"))
+        int minMs = (TIMEOUT_MS < 1000) ? 0 : TIMEOUT_MS - 1000;
+        int maxMs = TIMEOUT_MS + 1000;
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/aggregate-non-blocking?dbHits=10&minMs=" + minMs + "&maxMs=" + maxMs))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
