@@ -1,4 +1,3 @@
-  - agt: timeout
-  - routing slip, två impl till: En med cascading annonyma interface impl (+ ev Javav 8 Labmdas) + en med en massa callbacks + en för sekventiellt...
-  - del a upp i synkront och asynkront paket? Före eller after pattern-paket?
+-> routing slip, två impl till: En med cascading annonyma interface impl (+ ev Javav 8 Labmdas) + en med en massa callbacks + en för sekventiellt...
 
+- com.ning.http.client.AsyncHttpClient för JAVA 8???

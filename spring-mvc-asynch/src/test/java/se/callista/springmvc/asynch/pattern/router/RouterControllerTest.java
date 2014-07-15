@@ -52,17 +52,32 @@ public class RouterControllerTest {
     }
 
     @Test
-    public void testRouterNonBlocking() throws Exception {
+    public void testRouterNonBlockingCallback() throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/route-non-blocking?minMs=2000&maxMs=2000"))
-            .andExpect(request().asyncStarted())
-            .andReturn();
+                .andExpect(request().asyncStarted())
+                .andReturn();
 
         mvcResult.getAsyncResult();
 
         this.mockMvc.perform(asyncDispatch(mvcResult))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
-            .andExpect(content().string(expectedResult));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
+    }
+
+    @Test
+    public void testRouterNonBlockingAnonymous() throws Exception {
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/route-non-blocking-anonymous?minMs=2000&maxMs=2000"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+
+        this.mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
     }
 }
