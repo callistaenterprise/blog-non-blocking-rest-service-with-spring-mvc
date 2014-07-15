@@ -13,16 +13,18 @@ public class DbLookupRunnable implements Runnable {
     private int dbHits;
     private final int maxMs;
     private final int minMs;
+    private final int timeoutMs;
     private DeferredResult<String> deferredResult;
     private String url;
 
-    public DbLookupRunnable(LogHelper log, int dbLookupMs, int dbHits, String url, int minMs, int maxMs, DeferredResult<String> deferredResult) {
+    public DbLookupRunnable(LogHelper log, int dbLookupMs, int dbHits, String url, int minMs, int maxMs, int timeoutMs, DeferredResult<String> deferredResult) {
         this.log = log;
         this.dbLookupMs = dbLookupMs;
         this.dbHits = dbHits;
         this.url = url;
         this.minMs = minMs;
         this.maxMs = maxMs;
+        this.timeoutMs = timeoutMs;
 		this.deferredResult = deferredResult;
 	}
 
@@ -30,7 +32,7 @@ public class DbLookupRunnable implements Runnable {
 	public void run() {
         //seconds later in another thread...
         int noOfCalls = execute();
-        AggregatorEventHandler aeh = new AggregatorEventHandler(log, noOfCalls, url, minMs, maxMs, deferredResult);
+        AggregatorEventHandler aeh = new AggregatorEventHandler(log, noOfCalls, url, minMs, maxMs, timeoutMs, deferredResult);
         aeh.onStart();
 	}
 

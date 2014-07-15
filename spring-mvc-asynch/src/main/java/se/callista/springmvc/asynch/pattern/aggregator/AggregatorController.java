@@ -39,6 +39,9 @@ public class AggregatorController {
     @Value("${sp.non_blocking.url}")
     private String SP_NON_BLOCKING_URL;
 
+    @Value("${aggregator.timeoutMs}")
+    private int TIMEOUT_MS;
+
     @PostConstruct
     public void initAfterInject() {
         LOG = logFactory.getLog(AggregatorController.class, "aggregator");
@@ -84,16 +87,16 @@ public class AggregatorController {
 
     @RequestMapping("/aggregate-non-blocking")
     public DeferredResult<String> nonBlockingAggregator(
-        @RequestParam(value = "dbLookupMs", required = false, defaultValue = "0") int dbLookupMs,
-        @RequestParam(value = "dbHits",     required = false, defaultValue = "3") int dbHits,
-        @RequestParam(value = "minMs",      required = false, defaultValue = "0") int minMs,
-        @RequestParam(value = "maxMs",      required = false, defaultValue = "0") int maxMs) throws IOException {
+        @RequestParam(value = "dbLookupMs", required = false, defaultValue = "0")    int dbLookupMs,
+        @RequestParam(value = "dbHits",     required = false, defaultValue = "3")    int dbHits,
+        @RequestParam(value = "minMs",      required = false, defaultValue = "0")    int minMs,
+        @RequestParam(value = "maxMs",      required = false, defaultValue = "0")    int maxMs) throws IOException {
 
         LOG.logStartNonBlocking();
 
         DeferredResult<String> deferredResult = new DeferredResult<String>();
 
-        dbThreadPoolExecutor.execute(new DbLookupRunnable(LOG, dbLookupMs, dbHits, SP_NON_BLOCKING_URL, minMs, maxMs, deferredResult));
+        dbThreadPoolExecutor.execute(new DbLookupRunnable(LOG, dbLookupMs, dbHits, SP_NON_BLOCKING_URL, minMs, maxMs, TIMEOUT_MS, deferredResult));
 
         LOG.logLeaveThreadNonBlocking();
 

@@ -26,9 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class RouterControllerTest {
 
-    @Autowired
-    RouterController customerController;
-
     private MockMvc mockMvc;
 
     @Autowired

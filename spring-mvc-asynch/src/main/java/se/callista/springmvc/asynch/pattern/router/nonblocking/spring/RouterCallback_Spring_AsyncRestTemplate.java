@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.pattern.router;
+package se.callista.springmvc.asynch.pattern.router.nonblocking.spring;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFutureCallback;

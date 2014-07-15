@@ -1,10 +1,17 @@
 package se.callista.springmvc.asynch.pattern.aggregator;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.Assert.assertTrue;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -13,10 +20,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import se.callista.springmvc.asynch.Application;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by magnus on 29/05/14.
@@ -33,6 +36,9 @@ public class AggregatorControllerTest {
 
     @Autowired
     WebApplicationContext wac;
+
+    @Value("${aggregator.timeoutMs}")
+    private int TIMEOUT_MS;
 
     private final String expectedResult =
         "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n" +
@@ -61,14 +67,43 @@ public class AggregatorControllerTest {
     public void testAggregatorNonBlocking() throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/aggregate-non-blocking?minMs=2000&maxMs=2000"))
-            .andExpect(request().asyncStarted())
-            .andReturn();
+                .andExpect(request().asyncStarted())
+                .andReturn();
 
         mvcResult.getAsyncResult();
 
         this.mockMvc.perform(asyncDispatch(mvcResult))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
-            .andExpect(content().string(expectedResult));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
+    }
+
+    @Test
+    public void testAggregatorNonBlockingTimeout() throws Exception {
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/aggregate-non-blocking?dbHits=10&minMs=2000&maxMs=5000"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+
+        this.mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"));
+
+        String result = mvcResult.getAsyncResult().toString();
+
+        System.err.println("JSON: " + result);
+        String[] psArr = result.split("\n");
+
+        System.err.println("assert that no reponsetime was över the timeout: " + TIMEOUT_MS);
+        ObjectMapper mapper = new ObjectMapper();
+        for (int i = 0; i < psArr.length; i++) {
+            ProcessingStatus ps = mapper.readValue(psArr[i], ProcessingStatus.class);
+            System.err.println("psArr: " + ps.getStatus() + " - " + ps.getProcessingTimeMs());
+            assertTrue(ps.getProcessingTimeMs() < TIMEOUT_MS);
+        }
+
+
     }
 }

@@ -20,11 +20,12 @@ public class ProcessingController {
     
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingController.class);
 
-    private static Timer timer = new Timer();
     private static OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private static final AtomicLong lastRequestId = new AtomicLong(0);
     private static final AtomicLong concurrentRequests = new AtomicLong(0);
     private static long maxConcurrentRequests = 0;
+
+    private Timer timer = new Timer();
 
     @Value("${statistics.requestsPerLog}")
     private int STAT_REQS_PER_LOG;

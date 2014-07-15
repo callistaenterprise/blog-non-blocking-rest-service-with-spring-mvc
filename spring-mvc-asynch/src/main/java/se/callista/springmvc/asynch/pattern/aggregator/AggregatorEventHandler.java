@@ -1,6 +1,7 @@
 package se.callista.springmvc.asynch.pattern.aggregator;
 
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,11 @@ import se.callista.springmvc.asynch.common.log.LogHelper;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -17,6 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by magnus on 22/04/14.
  */
 public class AggregatorEventHandler {
+
+    private Timer timer = new Timer();
 
     private final LogHelper log;
 
@@ -26,6 +34,7 @@ public class AggregatorEventHandler {
     private final int noOfCalls;
     private final int maxMs;
     private final int minMs;
+    private final int timeoutMs;
     private final DeferredResult<String> deferredResult;
 
     private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
@@ -33,12 +42,15 @@ public class AggregatorEventHandler {
     private final AtomicInteger noOfResults = new AtomicInteger(0);
     private String result = "";
 
-    public AggregatorEventHandler(LogHelper log, int noOfCalls, String url, int minMs, int maxMs, DeferredResult<String> deferredResult) {
+    private List<ListenableFuture<Response>> executors = new ArrayList<>();
+
+    public AggregatorEventHandler(LogHelper log, int noOfCalls, String url, int minMs, int maxMs, int timeoutMs, DeferredResult<String> deferredResult) {
         this.log = log;
         this.noOfCalls = noOfCalls;
         this.SP_NON_BLOCKING_URL = url;
         this.minMs = minMs;
         this.maxMs = maxMs;
+        this.timeoutMs = timeoutMs;
         this.deferredResult = deferredResult;
     }
 
@@ -47,13 +59,24 @@ public class AggregatorEventHandler {
             for (int i = 0; i < noOfCalls; i++) {
                 log.logStartProcessingStepNonBlocking(i);
                 String url = SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs;
-                asyncHttpClient.prepareGet(url).execute(new AggregatorCallback(i, this));
+                executors.add(asyncHttpClient.prepareGet(url).execute(new AggregatorCallback(i, this)));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        // FIXME. ML. kickoff a timer as well + konfiguration...
+        // Setup a timer for the max wait-period
+        log.logMessage("Start timer for: " + timeoutMs + " ms.");
+        TimerTask timeoutTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                onTimeout();
+            }
+        };
+
+        // Schedule the timeout task
+        timer.schedule(timeoutTask, timeoutMs);
     }
 
     public void onResult(int id, Response response) {
@@ -81,6 +104,9 @@ public class AggregatorEventHandler {
 
     public void onError(int id, Throwable t) {
 
+        // Skip logging an error if we just canceled the request due to an timeout
+        if (t instanceof CancellationException) return;
+
         log.logExceptionNonBlocking(t);
 
         // Count down, aggregate answer and return if all answers (also cancel timer)...
@@ -98,10 +124,22 @@ public class AggregatorEventHandler {
     public void onTimeout() {
 
         // complete missing answers and return ...
-
+        log.logMessage("Timeout in aggregating service, only received answers from " + noOfResults.get() + " out of total " + noOfCalls + " expected responses.");
+        int i = 0;
+        for (ListenableFuture<Response> executor : executors) {
+            if (!executor.isDone()) {
+                log.logMessage("Cancel asych request #" + i);
+                executor.cancel(true);
+            }
+            i++;
+        }
+        onAllCompleted();
     }
 
     public void onAllCompleted() {
+        log.logMessage("All done, cancel timer");
+        timer.cancel();
+
         if (deferredResult.isSetOrExpired()) {
             log.logAlreadyExpiredNonBlocking();
         } else {

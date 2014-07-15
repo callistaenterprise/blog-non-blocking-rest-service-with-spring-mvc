@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.pattern.router;
+package se.callista.springmvc.asynch.pattern.router.nonblocking.callback;
 
 import org.springframework.web.context.request.async.DeferredResult;
 
