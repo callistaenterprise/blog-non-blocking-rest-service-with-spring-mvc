@@ -1,9 +1,8 @@
 package se.callista.springmvc.asynch.pattern.router.nonblocking.callback;
 
-import org.springframework.web.context.request.async.DeferredResult;
-
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Response;
+import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 
 public class RouterCallback extends AsyncCompletionHandler<Response> {

@@ -1,10 +1,5 @@
 package se.callista.springmvc.asynch.pattern.aggregator;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.junit.Assert.assertTrue;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +16,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import se.callista.springmvc.asynch.Application;
 
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 /**
  * Created by magnus on 29/05/14.
  */
@@ -28,9 +28,6 @@ import se.callista.springmvc.asynch.Application;
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 public class AggregatorControllerTest {
-
-    @Autowired
-    AggregatorController customerController;
 
     private MockMvc mockMvc;
 
@@ -83,8 +80,9 @@ public class AggregatorControllerTest {
 
         int minMs = (TIMEOUT_MS < 1000) ? 0 : TIMEOUT_MS - 1000;
         int maxMs = TIMEOUT_MS + 1000;
+        int dbHits = 10;
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/aggregate-non-blocking?dbHits=10&minMs=" + minMs + "&maxMs=" + maxMs))
+        MvcResult mvcResult = this.mockMvc.perform(get("/aggregate-non-blocking?dbHits=" + dbHits + "&minMs=" + minMs + "&maxMs=" + maxMs))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
@@ -99,14 +97,15 @@ public class AggregatorControllerTest {
         System.err.println("JSON: " + result);
         String[] psArr = result.split("\n");
 
-        System.err.println("assert that no reponsetime was över the timeout: " + TIMEOUT_MS);
+        // Verify that we got some timeouts
+        assertTrue(psArr.length < dbHits);
+
+        System.err.println("assert that no response time was over the timeout: " + TIMEOUT_MS);
         ObjectMapper mapper = new ObjectMapper();
         for (int i = 0; i < psArr.length; i++) {
             ProcessingStatus ps = mapper.readValue(psArr[i], ProcessingStatus.class);
             System.err.println("psArr: " + ps.getStatus() + " - " + ps.getProcessingTimeMs());
             assertTrue(ps.getProcessingTimeMs() < TIMEOUT_MS);
         }
-
-
     }
 }

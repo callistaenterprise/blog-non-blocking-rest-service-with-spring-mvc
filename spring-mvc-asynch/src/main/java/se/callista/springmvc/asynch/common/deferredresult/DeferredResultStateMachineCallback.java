@@ -1,7 +1,6 @@
 package se.callista.springmvc.asynch.common.deferredresult;
 
 import org.springframework.web.context.request.async.DeferredResult;
-import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.statemachine.State;
 import se.callista.springmvc.asynch.common.statemachine.StateMachineCallback;
 

@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.common.processors;
+package se.callista.springmvc.asynch.pattern.routingslip.nonblocking.statemachine;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Response;

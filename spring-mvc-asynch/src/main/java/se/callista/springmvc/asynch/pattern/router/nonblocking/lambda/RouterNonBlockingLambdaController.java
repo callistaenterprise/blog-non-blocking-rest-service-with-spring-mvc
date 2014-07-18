@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.pattern.router.nonblocking.anonymous;
+package se.callista.springmvc.asynch.pattern.router.nonblocking.lambda;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import se.callista.springmvc.asynch.common.lambdasupport.*;
+import se.callista.springmvc.asynch.common.lambdasupport.Error;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 
@@ -16,11 +18,11 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @RestController
-public class RouterNonBlockingAnonymousController {
+public class RouterNonBlockingLambdaController {
 
     private LogHelper LOG;
 
-    private AsyncHttpClient   asyncHttpClient    = new AsyncHttpClient();
+    private AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
 
     @Autowired
     private LogHelperFactory logFactory;
@@ -30,18 +32,18 @@ public class RouterNonBlockingAnonymousController {
 
     @PostConstruct
     public void initAfterInject() {
-        LOG = logFactory.getLog(RouterNonBlockingAnonymousController.class, "router");
+        LOG = logFactory.getLog(RouterNonBlockingLambdaController.class, "router");
     }
 
     /**
-     * Sample usage: curl "http://localhost:9080/router-non-blocking-anonymous?minMs=1000&maxMs=2000"
+     * Sample usage: curl "http://localhost:9080/router-non-blocking-lambda?minMs=1000&maxMs=2000"
      *
      * @param minMs
      * @param maxMs
      * @return
      * @throws java.io.IOException
      */
-    @RequestMapping("/router-non-blocking-anonymous")
+    @RequestMapping("/router-non-blocking-lambda")
     public DeferredResult<String> nonBlockingRouter(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) throws IOException {
@@ -52,33 +54,28 @@ public class RouterNonBlockingAnonymousController {
 
         String url = SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs;
 
-        asyncHttpClient.prepareGet(url).execute(
-            new AsyncCompletionHandler<Response>() {
-                @Override
-                public Response onCompleted(Response response) throws Exception {
-                    // TODO: Handle status codes other than 200...
-                    int httpStatus = response.getStatusCode();
+        asyncHttpClient.execute(url,
+            (response) ->  {
+                // TODO: Handle status codes other than 200...
+                int httpStatus = response.getStatusCode();
 
-                    if (deferredResult.isSetOrExpired()) {
-                        LOG.logAlreadyExpiredNonBlocking();
+                if (deferredResult.isSetOrExpired()) {
+                    LOG.logAlreadyExpiredNonBlocking();
 
-                    } else {
-                        boolean deferredStatus = deferredResult.setResult(response.getResponseBody());
-                        LOG.logEndNonBlocking(httpStatus, deferredStatus);
-                    }
-                    return response;
+                } else {
+                    boolean deferredStatus = deferredResult.setResult(response.getResponseBody());
+                    LOG.logEndNonBlocking(httpStatus, deferredStatus);
                 }
+                return response;
+            },
+            (throwable) -> {
+                // TODO: Handle asynchronous processing errors...
 
-                @Override
-                public void onThrowable(Throwable t){
-
-                    // TODO: Handle asynchronous processing errors...
-
-                    if (deferredResult.isSetOrExpired()) {
-                        LOG.logExceptionNonBlocking(t);
-                    }
+                if (deferredResult.isSetOrExpired()) {
+                    LOG.logExceptionNonBlocking(throwable);
                 }
-            });
+            }
+        );
 
         LOG.logLeaveThreadNonBlocking();
 

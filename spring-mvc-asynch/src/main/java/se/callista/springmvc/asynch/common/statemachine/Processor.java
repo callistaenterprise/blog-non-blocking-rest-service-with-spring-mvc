@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.common.processors;
+package se.callista.springmvc.asynch.common.statemachine;
 
 import se.callista.springmvc.asynch.common.statemachine.State;
 

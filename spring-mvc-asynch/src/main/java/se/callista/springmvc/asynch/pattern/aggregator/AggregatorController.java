@@ -1,8 +1,5 @@
 package se.callista.springmvc.asynch.pattern.aggregator;
 
-import com.sun.management.UnixOperatingSystemMXBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +16,6 @@ import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 public class AggregatorController {
@@ -32,9 +26,6 @@ public class AggregatorController {
 
     @Autowired
     private LogHelperFactory logFactory;
-
-    @Value("${sp.blocking.url}")
-    private String SP_BLOCKING_URL;
 
     @Value("${sp.non_blocking.url}")
     private String SP_NON_BLOCKING_URL;
@@ -69,7 +60,7 @@ public class AggregatorController {
             for (int i = 0; i < 3; i++) {
                 LOG.logStartProcessingStepBlocking(i);
                 ResponseEntity<String> result = restTemplate.getForEntity(
-                        SP_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);
+                        SP_NON_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);
 
                 // TODO: Handle status codes other than 200...
                 status = result.getStatusCode();

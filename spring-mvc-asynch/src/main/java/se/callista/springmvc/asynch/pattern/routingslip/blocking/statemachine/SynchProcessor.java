@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.common.processors;
+package se.callista.springmvc.asynch.pattern.routingslip.blocking.statemachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import se.callista.springmvc.asynch.common.statemachine.Processor;
 import se.callista.springmvc.asynch.common.statemachine.State;
 import se.callista.springmvc.asynch.common.statemachine.StateMachine;
 
@@ -24,19 +25,19 @@ public class SynchProcessor implements Processor {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${sp.blocking.url}")
-    private String SP_BLOCKING_URL;
+    @Value("${sp.non_blocking.url}")
+    private String SP_NON_BLOCKING_URL;
 
     @Override
     public void process(State state) {
 
         int sleeptimeMs = 100 * (state.getProcessingStepNo());
-        String url = SP_BLOCKING_URL + "?minMs=" + sleeptimeMs + "&maxMs=" + sleeptimeMs;
+        String url = SP_NON_BLOCKING_URL + "?minMs=" + sleeptimeMs + "&maxMs=" + sleeptimeMs;
 
         LOG.debug("Launch synch call");
 
         ResponseEntity<String> result = restTemplate.getForEntity(
-            SP_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, sleeptimeMs, sleeptimeMs);
+            SP_NON_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, sleeptimeMs, sleeptimeMs);
 
         // TODO: Handle status codes other than 200...
         HttpStatus status = result.getStatusCode();

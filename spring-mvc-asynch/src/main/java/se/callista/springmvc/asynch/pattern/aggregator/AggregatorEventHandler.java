@@ -3,21 +3,16 @@ package se.callista.springmvc.asynch.pattern.aggregator;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by magnus on 22/04/14.

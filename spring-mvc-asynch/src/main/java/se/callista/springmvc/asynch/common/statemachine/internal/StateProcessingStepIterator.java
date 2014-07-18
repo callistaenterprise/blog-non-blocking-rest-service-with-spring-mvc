@@ -1,6 +1,6 @@
 package se.callista.springmvc.asynch.common.statemachine.internal;
 
-import se.callista.springmvc.asynch.common.processors.Processor;
+import se.callista.springmvc.asynch.common.statemachine.Processor;
 
 import java.util.Iterator;
 

@@ -1,19 +1,17 @@
 package se.callista.springmvc.asynch.pattern.router.nonblocking.callback;
 
-import java.io.IOException;
-
+import com.ning.http.client.AsyncHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
-
-import com.ning.http.client.AsyncHttpClient;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 @RestController
 public class RouterNonBlockingCallbackController {
@@ -34,14 +32,14 @@ public class RouterNonBlockingCallbackController {
     }
 
     /**
-     * Sample usage: curl "http://localhost:9080/route-non-blocking?minMs=1000&maxMs=2000"
+     * Sample usage: curl "http://localhost:9080/router-non-blocking-callback?minMs=1000&maxMs=2000"
      *
      * @param minMs
      * @param maxMs
      * @return
      * @throws IOException
      */
-    @RequestMapping("/route-non-blocking")
+    @RequestMapping("/router-non-blocking-callback")
     public DeferredResult<String> nonBlockingRouter(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) throws IOException {
@@ -50,8 +48,8 @@ public class RouterNonBlockingCallbackController {
 
         DeferredResult<String> deferredResult = new DeferredResult<String>();
 
-        asyncHttpClient.prepareGet(SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs).execute(
-            new RouterCallback(LOG, deferredResult));
+        String url = SP_NON_BLOCKING_URL + "?minMs=" + minMs + "&maxMs=" + maxMs;
+        asyncHttpClient.prepareGet(url).execute(new RouterCallback(LOG, deferredResult));
 
         LOG.logLeaveThreadNonBlocking();
 

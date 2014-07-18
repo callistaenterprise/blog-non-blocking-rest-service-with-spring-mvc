@@ -1,8 +1,5 @@
 package se.callista.springmvc.asynch.pattern.routingslip;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +14,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import se.callista.springmvc.asynch.Application;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 /**
  * Created by magnus on 29/05/14.
  */
@@ -24,9 +25,6 @@ import se.callista.springmvc.asynch.Application;
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 public class RoutingSlipControllerTest {
-
-    @Autowired
-    RoutingSlipController customerController;
 
     private MockMvc mockMvc;
 
@@ -59,18 +57,33 @@ public class RoutingSlipControllerTest {
     }
 
     @Test
-    public void testRoutingSlipNonBlocking() throws Exception {
+    public void testRoutingSlipNonBlockingStateMachine() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/routing-slip-non-blocking"))
-            .andExpect(request().asyncStarted())
+        MvcResult mvcResult = this.mockMvc.perform(get("/routing-slip-non-blocking-state-machine"))
+                .andExpect(request().asyncStarted())
 //            .andExpect(request().asyncResult(expectedResult))
-            .andReturn();
+                .andReturn();
 
         mvcResult.getAsyncResult();
 
         this.mockMvc.perform(asyncDispatch(mvcResult))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
-            .andExpect(content().string(expectedResult));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
+    }
+    @Test
+    public void testRoutingSlipNonBlockingLambda() throws Exception {
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/routing-slip-non-blocking-lambda"))
+                .andExpect(request().asyncStarted())
+//            .andExpect(request().asyncResult(expectedResult))
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+
+        this.mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
     }
 }

@@ -45,7 +45,7 @@ public class RouterControllerTest {
 
     @Test
     public void testRouterBlocking() throws Exception{
-        this.mockMvc.perform(get("/route-blocking?minMs=2000&maxMs=2000"))
+        this.mockMvc.perform(get("/router-blocking?minMs=2000&maxMs=2000"))
             .andExpect(status().isOk())
             .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
             .andExpect(content().string(expectedResult));
@@ -54,7 +54,7 @@ public class RouterControllerTest {
     @Test
     public void testRouterNonBlockingCallback() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/route-non-blocking?minMs=2000&maxMs=2000"))
+        MvcResult mvcResult = this.mockMvc.perform(get("/router-non-blocking-callback?minMs=2000&maxMs=2000"))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
@@ -69,7 +69,38 @@ public class RouterControllerTest {
     @Test
     public void testRouterNonBlockingAnonymous() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/route-non-blocking-anonymous?minMs=2000&maxMs=2000"))
+        MvcResult mvcResult = this.mockMvc.perform(get("/router-non-blocking-anonymous?minMs=2000&maxMs=2000"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+
+        this.mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
+    }
+
+    @Test
+    public void testRouterNonBlockingLambda() throws Exception {
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/router-non-blocking-lambda?minMs=2000&maxMs=2000"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+
+        this.mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
+    }
+
+    @Test
+    public void testRouterNonBlockingSpring() throws Exception {
+
+        // NOTE: Today's implementation in Spring of the AsyncRestTemplate is thread-blocking and therefore doesn't scale
+        MvcResult mvcResult = this.mockMvc.perform(get("/router-non-blocking-anonymous?minMs=2000&maxMs=2000"))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 

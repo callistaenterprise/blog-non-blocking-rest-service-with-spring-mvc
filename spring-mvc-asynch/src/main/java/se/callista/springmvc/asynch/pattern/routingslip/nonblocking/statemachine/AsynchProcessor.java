@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.common.processors;
+package se.callista.springmvc.asynch.pattern.routingslip.nonblocking.statemachine;
 
 import com.ning.http.client.AsyncHttpClient;
 import org.slf4j.Logger;
@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import se.callista.springmvc.asynch.common.statemachine.Processor;
 import se.callista.springmvc.asynch.common.statemachine.State;
 import se.callista.springmvc.asynch.common.statemachine.StateMachine;
 

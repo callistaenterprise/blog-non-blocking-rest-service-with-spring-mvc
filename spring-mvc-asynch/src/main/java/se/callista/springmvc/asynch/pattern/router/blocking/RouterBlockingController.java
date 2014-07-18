@@ -23,8 +23,8 @@ public class RouterBlockingController {
     @Autowired
     private LogHelperFactory logFactory;
 
-    @Value("${sp.blocking.url}")
-    private String SP_BLOCKING_URL;
+    @Value("${sp.non_blocking.url}")
+    private String SP_NON_BLOCKING_URL;
 
     @PostConstruct
     public void initAfterInject() {
@@ -32,13 +32,13 @@ public class RouterBlockingController {
     }
 
     /**
-     * Sample usage: curl "http://localhost:9080/route-blocking?minMs=1000&maxMs=2000"
+     * Sample usage: curl "http://localhost:9080/router-blocking?minMs=1000&maxMs=2000"
      *
      * @param minMs
      * @param maxMs
      * @return
      */
-    @RequestMapping("/route-blocking")
+    @RequestMapping("/router-blocking")
     public String blockingRouter(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) {
@@ -48,8 +48,8 @@ public class RouterBlockingController {
         LOG.logStartBlocking();
 
         try {
-            ResponseEntity<String> result = restTemplate.getForEntity(
-                SP_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);        
+            String url = SP_NON_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}";
+            ResponseEntity<String> result = restTemplate.getForEntity(url, String.class, minMs, maxMs);
     
             // TODO: Handle status codes other than 200...
             status = result.getStatusCode();

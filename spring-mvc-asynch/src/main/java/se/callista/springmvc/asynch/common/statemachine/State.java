@@ -1,8 +1,7 @@
 package se.callista.springmvc.asynch.common.statemachine;
 
-import se.callista.springmvc.asynch.common.processors.Processor;
-import se.callista.springmvc.asynch.common.statemachine.internal.StateProcessingStepIterator;
 import se.callista.springmvc.asynch.common.log.LogHelper;
+import se.callista.springmvc.asynch.common.statemachine.internal.StateProcessingStepIterator;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;

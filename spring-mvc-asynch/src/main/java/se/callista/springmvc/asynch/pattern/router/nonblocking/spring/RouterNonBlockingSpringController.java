@@ -34,6 +34,8 @@ public class RouterNonBlockingSpringController {
     }
 
     /**
+     * Sample usage: curl "http://localhost:9080/router-non-blocking-spring?minMs=1000&maxMs=2000"
+     *
      * The spring version of asynch http client has two major drawbacks
      * 1. It doesn't work with the code below, no call is made to the SP (probably my fault :-)
      * 2. The call is not executed non-blocking but instead in a separate thread, i.e. it doesn't scale very good...
@@ -45,7 +47,7 @@ public class RouterNonBlockingSpringController {
      * @return y3
      * @throws java.io.IOException
      */
-    @RequestMapping("/route-non-blocking-spring")
+    @RequestMapping("/router-non-blocking-spring")
     public DeferredResult<String> nonBlockingRouter_Spring(
         @RequestParam(value = "minMs", required = false, defaultValue = "0") int minMs,
         @RequestParam(value = "maxMs", required = false, defaultValue = "0") int maxMs) throws IOException {
@@ -54,8 +56,8 @@ public class RouterNonBlockingSpringController {
 
         DeferredResult<String> deferredResult = new DeferredResult<String>();
 
-        ListenableFuture<ResponseEntity<String>> futureEntity = asyncRestTemplate.getForEntity(
-            SP_NON_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}", String.class, minMs, maxMs);        
+        String url = SP_NON_BLOCKING_URL + "?minMs={minMs}&maxMs={maxMs}";
+        ListenableFuture<ResponseEntity<String>> futureEntity = asyncRestTemplate.getForEntity(url, String.class, minMs, maxMs);
 
         // Register a callback for the completion of the asynchronous rest call
         futureEntity.addCallback(new RouterCallback_Spring_AsyncRestTemplate(LOG, deferredResult));

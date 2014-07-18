@@ -1,7 +1,6 @@
 package se.callista.springmvc.asynch.common.statemachine;
 
 import org.springframework.stereotype.Component;
-import se.callista.springmvc.asynch.common.processors.Processor;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 
 import java.util.Iterator;
