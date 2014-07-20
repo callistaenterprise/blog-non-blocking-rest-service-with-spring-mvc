@@ -1,3 +1,5 @@
 -> routing slip, två impl till: En med cascading annonyma interface impl (+ ev Javav 8 Labmdas) + en med en massa callbacks + en för sekventiellt...
 
-- com.ning.http.client.AsyncHttpClient för JAVA 8???
+- testa av java 8 stöd i IntelliJ, skal man köra gradle idea tasket eller räcker det at importera projektetn igen?
+
+- autostart av teststubbe

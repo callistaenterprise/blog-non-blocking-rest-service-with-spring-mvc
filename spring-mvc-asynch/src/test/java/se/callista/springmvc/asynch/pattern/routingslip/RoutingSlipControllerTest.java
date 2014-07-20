@@ -49,11 +49,19 @@ public class RoutingSlipControllerTest {
     }
 
     @Test
-    public void testRoutingSlipBlocking() throws Exception{
-        this.mockMvc.perform(get("/routing-slip-blocking"))
+    public void testRoutingSlipBlockingStateMachine() throws Exception{
+        this.mockMvc.perform(get("/routing-slip-blocking-state-machine"))
             .andExpect(status().isOk())
             .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
             .andExpect(content().string(expectedResult));
+    }
+
+    @Test
+    public void testRoutingSlipBlockingPlain() throws Exception{
+        this.mockMvc.perform(get("/routing-slip-blocking-plain"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
     }
 
     @Test
@@ -71,6 +79,7 @@ public class RoutingSlipControllerTest {
                 .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
                 .andExpect(content().string(expectedResult));
     }
+
     @Test
     public void testRoutingSlipNonBlockingLambda() throws Exception {
 

@@ -13,7 +13,7 @@ import se.callista.springmvc.asynch.common.statemachine.StateMachine;
 import javax.annotation.PostConstruct;
 
 @RestController
-public class RoutingSlipBlockingController {
+public class RoutingSlipBlockingStateMachineController {
 
     private LogHelper LOG;
 
@@ -28,15 +28,15 @@ public class RoutingSlipBlockingController {
 
     @PostConstruct
     public void initAfterInject() {
-        LOG = logFactory.getLog(RoutingSlipBlockingController.class, "routing-slip");
+        LOG = logFactory.getLog(RoutingSlipBlockingStateMachineController.class, "routing-slip");
     }
 
     /**
-     * Sample usage: curl "http://localhost:9080/routing-slip-blocking"
+     * Sample usage: curl "http://localhost:9080/routing-slip-blocking-state-machine"
      *
      * @return
      */
-    @RequestMapping("/routing-slip-blocking")
+    @RequestMapping("/routing-slip-blocking-state-machine")
     public String blockingRoutingSlip() {
 
         HttpStatus status = HttpStatus.OK;
