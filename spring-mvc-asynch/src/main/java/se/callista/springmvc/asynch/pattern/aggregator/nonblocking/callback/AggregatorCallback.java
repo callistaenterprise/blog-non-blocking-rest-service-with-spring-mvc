@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.pattern.aggregator;
+package se.callista.springmvc.asynch.pattern.aggregator.nonblocking.callback;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Response;

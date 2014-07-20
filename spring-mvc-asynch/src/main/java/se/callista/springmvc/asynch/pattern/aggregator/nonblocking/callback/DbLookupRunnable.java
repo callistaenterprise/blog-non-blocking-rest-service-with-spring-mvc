@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.pattern.aggregator;
+package se.callista.springmvc.asynch.pattern.aggregator.nonblocking.callback;
 
 import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.common.log.LogHelper;
