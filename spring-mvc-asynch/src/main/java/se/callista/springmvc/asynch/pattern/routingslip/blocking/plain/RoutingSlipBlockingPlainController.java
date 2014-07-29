@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.log.LogHelperFactory;
-import se.callista.springmvc.asynch.pattern.router.blocking.RouterBlockingController;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;

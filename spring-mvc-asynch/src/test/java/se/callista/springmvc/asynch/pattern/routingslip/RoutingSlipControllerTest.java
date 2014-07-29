@@ -13,10 +13,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import se.callista.springmvc.asynch.Application;
+import se.callista.springmvc.asynch.common.AsynchTestBase;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 /**
  * Created by magnus on 29/05/14.
@@ -24,13 +26,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-public class RoutingSlipControllerTest {
+public class RoutingSlipControllerTest extends AsynchTestBase {
 
     private MockMvc mockMvc;
 
     @Autowired
     WebApplicationContext wac;
 
+    private final String expectedResultSingle = "{\"status\":\"Ok\",\"processingTimeMs\":2000}";
     private final String expectedResult =
         "{\"status\":\"Ok\",\"processingTimeMs\":100}\n" +
         "{\"status\":\"Ok\",\"processingTimeMs\":200}\n" +

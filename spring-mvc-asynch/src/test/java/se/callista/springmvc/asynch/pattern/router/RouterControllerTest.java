@@ -13,10 +13,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import se.callista.springmvc.asynch.Application;
+import se.callista.springmvc.asynch.common.AsynchTestBase;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 /**
  * Created by magnus on 29/05/14.
@@ -24,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-public class RouterControllerTest {
+public class RouterControllerTest extends AsynchTestBase {
 
     private MockMvc mockMvc;
 

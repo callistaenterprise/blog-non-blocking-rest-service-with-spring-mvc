@@ -1,6 +1,9 @@
 package se.callista.springmvc.asynch.common.lambdasupport;
 
-import com.ning.http.client.*;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Response;
 
 import java.io.IOException;
 

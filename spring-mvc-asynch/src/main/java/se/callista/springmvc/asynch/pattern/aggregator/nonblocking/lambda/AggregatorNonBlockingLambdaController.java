@@ -1,7 +1,5 @@
 package se.callista.springmvc.asynch.pattern.aggregator.nonblocking.lambda;
 
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,16 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
-import se.callista.springmvc.asynch.common.lambdasupport.AsyncHttpClientLambdaAware;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 public class AggregatorNonBlockingLambdaController {

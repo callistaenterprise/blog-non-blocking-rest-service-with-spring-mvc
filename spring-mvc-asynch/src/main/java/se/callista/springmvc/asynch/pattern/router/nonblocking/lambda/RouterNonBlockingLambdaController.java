@@ -1,16 +1,12 @@
 package se.callista.springmvc.asynch.pattern.router.nonblocking.lambda;
 
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
-import se.callista.springmvc.asynch.common.lambdasupport.*;
-import se.callista.springmvc.asynch.common.lambdasupport.Error;
+import se.callista.springmvc.asynch.common.lambdasupport.AsyncHttpClientLambdaAware;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.log.LogHelperFactory;
 

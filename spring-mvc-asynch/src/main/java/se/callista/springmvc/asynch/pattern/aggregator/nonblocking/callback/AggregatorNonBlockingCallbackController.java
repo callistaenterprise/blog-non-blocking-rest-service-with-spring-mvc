@@ -7,7 +7,6 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 import se.callista.springmvc.asynch.common.log.LogHelper;
 import se.callista.springmvc.asynch.common.log.LogHelperFactory;

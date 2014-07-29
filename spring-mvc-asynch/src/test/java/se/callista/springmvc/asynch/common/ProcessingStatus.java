@@ -1,4 +1,4 @@
-package se.callista.springmvc.asynch.pattern.aggregator;
+package se.callista.springmvc.asynch.common;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

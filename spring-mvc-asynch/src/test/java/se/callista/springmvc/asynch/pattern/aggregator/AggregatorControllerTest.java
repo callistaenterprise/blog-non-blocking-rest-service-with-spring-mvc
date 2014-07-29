@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import se.callista.springmvc.asynch.Application;
+import se.callista.springmvc.asynch.common.AsynchTestBase;
+import se.callista.springmvc.asynch.common.ProcessingStatus;
 
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
@@ -27,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-public class AggregatorControllerTest {
+public class AggregatorControllerTest extends AsynchTestBase {
 
     private MockMvc mockMvc;
 
@@ -37,10 +39,11 @@ public class AggregatorControllerTest {
     @Value("${aggregator.timeoutMs}")
     private int TIMEOUT_MS;
 
+    private final String expectedResultSingle = "{\"status\":\"Ok\",\"processingTimeMs\":2000}";
     private final String expectedResult =
-        "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n" +
-        "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n" +
-        "{\"status\":\"Ok\",\"processingTimeMs\":2000}\n";
+        expectedResultSingle + '\n' +
+        expectedResultSingle + '\n' +
+        expectedResultSingle + '\n';
 
     @Before
     public void setup(){
@@ -50,6 +53,7 @@ public class AggregatorControllerTest {
 
         // Setup Spring test in webapp-mode (same config as spring-boot)
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+
     }
 
     @Test
@@ -98,7 +102,7 @@ public class AggregatorControllerTest {
         String[] psArr = result.split("\n");
 
         // Verify that we got some timeouts
-        assertTrue(psArr.length < dbHits);
+        assertTrue("Expected at least one timeout to occur", psArr.length < dbHits);
 
         System.err.println("assert that no response time was over the timeout: " + TIMEOUT_MS);
         ObjectMapper mapper = new ObjectMapper();
@@ -147,7 +151,7 @@ public class AggregatorControllerTest {
         String[] psArr = result.split("\n");
 
         // Verify that we got some timeouts
-        assertTrue(psArr.length < dbHits);
+        assertTrue("Expected at least one timeout to occur", psArr.length < dbHits);
 
         System.err.println("assert that no response time was over the timeout: " + TIMEOUT_MS);
         ObjectMapper mapper = new ObjectMapper();
