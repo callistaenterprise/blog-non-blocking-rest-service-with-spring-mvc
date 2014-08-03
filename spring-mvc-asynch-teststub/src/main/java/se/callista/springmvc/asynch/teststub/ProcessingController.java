@@ -29,6 +29,17 @@ public class ProcessingController {
 
     @Value("${statistics.requestsPerLog}")
     private int STAT_REQS_PER_LOG;
+    private int defaultMinMs = 0;
+    private int defaultMaxMs = 0;
+
+    @RequestMapping("/set-default-processing-time")
+    public void setDefaultProcessingTime(
+            @RequestParam(value = "minMs", required = true) int minMs,
+            @RequestParam(value = "maxMs", required = true) int maxMs) {
+        this.defaultMinMs = minMs;
+        this.defaultMaxMs = maxMs;
+        LOG.info("Set default response time to {} - {} ms.", minMs, maxMs);
+    }
 
     /**
      * Sample usage: curl "http://localhost:9090/process-blocking?minMs=1000&maxMs=2000"
@@ -113,6 +124,11 @@ public class ProcessingController {
     }
 
     private int calculateProcessingTime(int minMs, int maxMs) {
+        if (minMs == 0 && maxMs == 0) {
+            minMs = defaultMinMs;
+            maxMs = defaultMaxMs;
+        }
+
         if (maxMs < minMs) maxMs = minMs;
         int processingTimeMs = minMs + (int) (Math.random() * (maxMs - minMs));
         return processingTimeMs;

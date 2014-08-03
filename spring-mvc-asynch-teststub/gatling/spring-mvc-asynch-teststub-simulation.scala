@@ -7,6 +7,11 @@ import com.excilys.ebi.gatling.http.Headers.Names._
 import akka.util.duration._
 import bootstrap._
 
+/**
+ * Started with a command like:
+ * $ cd $GATLING_HOME/bin
+ * $ ./gatling.sh -s "basic.SpringMvcAsynchTeststubSimulation"
+ */
 class SpringMvcAsynchTeststubSimulation extends Simulation {
 
   val rampUpTimeSecs = 60
