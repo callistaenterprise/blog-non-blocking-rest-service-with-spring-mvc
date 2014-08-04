@@ -18,7 +18,7 @@ public class RouterNonBlockingCallbackController {
 
     private LogHelper LOG;
 
-    private AsyncHttpClient   asyncHttpClient    = new AsyncHttpClient();
+    private static final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
     @Autowired
     private LogHelperFactory logFactory;

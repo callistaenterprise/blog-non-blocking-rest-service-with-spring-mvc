@@ -28,7 +28,7 @@ public class Executor {
     final private int minMs;
     final private int maxMs;
 
-    private AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
+    private static final AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
     private List<ListenableFuture<Response>> concurrentExecutors = new ArrayList<>();
     private Timer timer = new Timer();
     final AtomicInteger noOfResults = new AtomicInteger(0);

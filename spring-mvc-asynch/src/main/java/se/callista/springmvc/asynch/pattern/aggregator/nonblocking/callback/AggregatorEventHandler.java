@@ -32,7 +32,7 @@ public class AggregatorEventHandler {
     private final int timeoutMs;
     private final DeferredResult<String> deferredResult;
 
-    private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    private final static AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
     private final AtomicInteger noOfResults = new AtomicInteger(0);
     private String result = "";

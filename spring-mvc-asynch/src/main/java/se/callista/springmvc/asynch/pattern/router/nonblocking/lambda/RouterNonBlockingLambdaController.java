@@ -18,7 +18,7 @@ public class RouterNonBlockingLambdaController {
 
     private LogHelper LOG;
 
-    private AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
+    private static final AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
 
     @Autowired
     private LogHelperFactory logFactory;

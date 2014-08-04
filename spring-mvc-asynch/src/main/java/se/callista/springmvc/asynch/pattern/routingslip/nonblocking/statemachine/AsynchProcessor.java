@@ -23,7 +23,7 @@ public class AsynchProcessor implements Processor {
     @Autowired
     private StateMachine stateMachine;
 
-    private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    private static final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
     @Value("${sp.non_blocking.url}")
     private String SP_NON_BLOCKING_URL;

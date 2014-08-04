@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public class AsyncHttpClientLambdaAware {
 
-    private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    private static final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
     public ListenableFuture<Response> execute(String url, final Completed c, final Error e) throws IOException {
         return asyncHttpClient.prepareGet(url).execute(new AsyncCompletionHandler<Response>() {
