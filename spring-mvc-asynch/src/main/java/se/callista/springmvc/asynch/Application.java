@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import se.callista.springmvc.asynch.common.lambdasupport.AsyncHttpClientLambdaAware;
 import se.callista.springmvc.asynch.config.MyEmbeddedServletContainerCustomizer;
 
 @ComponentScan()
@@ -41,6 +42,12 @@ public class Application {
         tpte.setQueueCapacity(THREAD_POOL_DB_QUEUE_SIZE);
         tpte.initialize();
         return tpte;
+    }
+
+    @Bean
+    public AsyncHttpClientLambdaAware getAsyncHttpClient() {
+        LOG.info("### Creates a new AsyncHttpClientLambdaAware-object");
+        return new AsyncHttpClientLambdaAware();
     }
 
     public static void main(String[] args) {

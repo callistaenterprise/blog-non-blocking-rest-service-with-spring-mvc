@@ -15,7 +15,7 @@
     </encoder>
   </appender>
   
-  <logger name="se.callista.springmvc.asynch" level="INFO"/>
+  <logger name="se.callista.springmvc.asynch" level="DEBUG"/>
   
   <root level="INFO">
     <appender-ref ref="stdout"/>
