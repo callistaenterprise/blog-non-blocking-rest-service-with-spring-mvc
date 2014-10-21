@@ -86,7 +86,7 @@ public class LogHelper {
 
     public void logLeaveThreadNonBlocking() {
 
-        long concReqs = concurrentRequests.getAndDecrement();
+        long concReqs = concurrentRequests.get();
 
         log.debug("{}: Processing of non-blocking {} request #{}, leave the request thread", concReqs, name, reqId);
     }
