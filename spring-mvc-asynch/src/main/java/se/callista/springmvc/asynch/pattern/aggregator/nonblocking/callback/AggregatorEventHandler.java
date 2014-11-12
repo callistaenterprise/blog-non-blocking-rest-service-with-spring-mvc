@@ -81,17 +81,24 @@ public class AggregatorEventHandler {
             int httpStatus = response.getStatusCode();
             log.logEndProcessingStepNonBlocking(id, httpStatus);
 
-            // Count down, aggregate answer and return if all answers (also cancel timer)...
-            int noOfRes = noOfResults.incrementAndGet();
-
-            // Perform the aggregation...
+            // If many requests completes at the same time the following code must be executed in sequence for one thread at a time
+            // Since we don't have any Actor-like mechanism to rely on (for the time being...) we simply ensure that the code block is executed by one thread at a time by an old school synchronized block
+            // Since the processing in the block is very limited it will not cause a bottleneck.
             synchronized (result) {
+                // Count down, aggregate answer and return if all answers (also cancel timer)...
+                int noOfRes = noOfResults.incrementAndGet();
+
+                // Perform the aggregation...
+                log.logMessage("Safely adding response #" + id);
                 result += response.getResponseBody() + '\n';
+
+                if (noOfRes >= noOfCalls) {
+                    onAllCompleted();
+                }
             }
 
-            if (noOfRes >= noOfCalls) {
-                onAllCompleted();
-            }
+
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

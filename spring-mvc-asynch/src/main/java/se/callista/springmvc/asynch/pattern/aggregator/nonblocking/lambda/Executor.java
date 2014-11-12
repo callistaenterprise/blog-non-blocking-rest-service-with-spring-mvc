@@ -29,8 +29,9 @@ public class Executor {
     final private int maxMs;
 
     private static final AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
+    private static Timer timer = new Timer();
+    private TimerTask timeoutTask = null;
     private List<ListenableFuture<Response>> concurrentExecutors = new ArrayList<>();
-    private Timer timer = new Timer();
     final AtomicInteger noOfResults = new AtomicInteger(0);
     private int noOfCalls = 0;
     private DeferredResult<String> deferredResult = null;
@@ -67,16 +68,20 @@ public class Executor {
                         int httpStatus = response.getStatusCode();
                         log.logEndProcessingStepNonBlocking(id, httpStatus);
 
-                        // Count down, aggregate answer and return if all answers (also cancel timer)...
-                        int noOfRes = noOfResults.incrementAndGet();
-
-                        // Perform the aggregation...
+                        // If many requests completes at the same time the following code must be executed in sequence for one thread at a time
+                        // Since we don't have any Actor-like mechanism to rely on (for the time being...) we simply ensure that the code block is executed by one thread at a time by an old school synchronized block
+                        // Since the processing in the block is very limited it will not cause a bottleneck.
                         synchronized (resultArr) {
-                            resultArr.add(response.getResponseBody());
-                        }
+                            // Count down, aggregate answer and return if all answers (also cancel timer)...
+                            int noOfRes = noOfResults.incrementAndGet();
 
-                        if (noOfRes >= noOfCalls) {
-                            onAllCompleted();
+                            // Perform the aggregation...
+                            log.logMessage("Safely adding response #" + id);
+                            resultArr.add(response.getResponseBody());
+
+                            if (noOfRes >= noOfCalls) {
+                                onAllCompleted();
+                            }
                         }
                         return response;
                     }));
@@ -87,7 +92,7 @@ public class Executor {
 
             // Setup a timer for the max wait-period
             log.logMessage("Start timer for: " + timeoutMs + " ms.");
-            TimerTask timeoutTask = new TimerTask() {
+            timeoutTask = new TimerTask() {
 
                 @Override
                 public void run() {
@@ -123,7 +128,7 @@ public class Executor {
 
     private void onAllCompleted() {
         log.logMessage("All done, cancel timer");
-        timer.cancel();
+        timeoutTask.cancel();
 
         if (deferredResult.isSetOrExpired()) {
             log.logAlreadyExpiredNonBlocking();
