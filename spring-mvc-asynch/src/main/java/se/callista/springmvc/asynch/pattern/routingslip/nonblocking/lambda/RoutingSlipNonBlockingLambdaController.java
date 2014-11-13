@@ -19,6 +19,21 @@ import java.util.List;
 @RestController
 public class RoutingSlipNonBlockingLambdaController {
 
+    private class Result {
+        List<String> resultList = new ArrayList<>();
+
+        public void processResult(String result) {
+            resultList.add(result);
+        }
+
+        public String getTotalResult() {
+            String totalResult = "";
+            for (String r : resultList)
+                totalResult += r + '\n';
+            return totalResult;
+        }
+    }
+
     private LogHelper LOG;
 
     private static final AsyncHttpClientLambdaAware asyncHttpClient = new AsyncHttpClientLambdaAware();
@@ -28,8 +43,6 @@ public class RoutingSlipNonBlockingLambdaController {
 
     @Value("${sp.non_blocking.url}")
     private String SP_NON_BLOCKING_URL;
-
-    private List<String> resultList = new ArrayList<>();
 
     @PostConstruct
     public void initAfterInject() {
@@ -46,7 +59,8 @@ public class RoutingSlipNonBlockingLambdaController {
 
         LOG.logStartNonBlocking();
 
-        final DeferredResult<String> deferredResult = new DeferredResult<>();
+        DeferredResult<String> deferredResult = new DeferredResult<>();
+        Result r = new Result();
 
         // Kick off the asynch processing of five sequentially executed asynch processing steps
 
@@ -57,7 +71,7 @@ public class RoutingSlipNonBlockingLambdaController {
                     LOG.logEndProcessingStepNonBlocking(1, r1.getStatusCode());
 
                     // Process response #1
-                    processResult(r1.getResponseBody());
+                    r.processResult(r1.getResponseBody());
 
                     // Send request #2
                     LOG.logStartProcessingStepNonBlocking(2);
@@ -66,7 +80,7 @@ public class RoutingSlipNonBlockingLambdaController {
                                 LOG.logEndProcessingStepNonBlocking(2, r2.getStatusCode());
 
                                 // Process response #2
-                                processResult(r2.getResponseBody());
+                                r.processResult(r2.getResponseBody());
 
                                 // Send request #3
                                 LOG.logStartProcessingStepNonBlocking(3);
@@ -75,7 +89,7 @@ public class RoutingSlipNonBlockingLambdaController {
                                             LOG.logEndProcessingStepNonBlocking(3, r3.getStatusCode());
 
                                             // Process response #3
-                                            processResult(r3.getResponseBody());
+                                            r.processResult(r3.getResponseBody());
 
                                             // Send request #4
                                             LOG.logStartProcessingStepNonBlocking(4);
@@ -84,7 +98,7 @@ public class RoutingSlipNonBlockingLambdaController {
                                                         LOG.logEndProcessingStepNonBlocking(4, r4.getStatusCode());
 
                                                         // Process response #4
-                                                        processResult(r4.getResponseBody());
+                                                        r.processResult(r4.getResponseBody());
 
                                                         // Send request #5
                                                         LOG.logStartProcessingStepNonBlocking(5);
@@ -93,10 +107,10 @@ public class RoutingSlipNonBlockingLambdaController {
                                                                 LOG.logEndProcessingStepNonBlocking(5, r5.getStatusCode());
 
                                                                 // Process response #5
-                                                                processResult(r5.getResponseBody());
+                                                                r.processResult(r5.getResponseBody());
 
                                                                 // Get the total result and set it on the deferred result
-                                                                boolean deferredStatus = deferredResult.setResult(getTotalResult());
+                                                                boolean deferredStatus = deferredResult.setResult(r.getTotalResult());
                                                                 LOG.logEndNonBlocking(r5.getStatusCode(), deferredStatus);
 
                                                                 return r5;
@@ -120,16 +134,4 @@ public class RoutingSlipNonBlockingLambdaController {
         int sleeptimeMs = 100 * processingStepNo;
         return SP_NON_BLOCKING_URL + "?minMs=" + sleeptimeMs + "&maxMs=" + sleeptimeMs;
     }
-
-    private void processResult(String result) {
-        resultList.add(result);
-    }
-
-    private String getTotalResult() {
-        String totalResult = "";
-        for (String r : resultList)
-            totalResult += r + '\n';
-        return totalResult;
-    }
-
 }

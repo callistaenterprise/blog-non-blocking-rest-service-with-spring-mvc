@@ -98,4 +98,25 @@ public class RoutingSlipControllerTest extends AsynchTestBase {
                 .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
                 .andExpect(content().string(expectedResult));
     }
+
+    /**
+     * Same test as testRoutingSlipNonBlockingLambda that ensures that no state is kept between calls to the routing-slip-non-blocking-lambda service
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testRoutingSlipNonBlockingLambda2() throws Exception {
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/routing-slip-non-blocking-lambda"))
+                .andExpect(request().asyncStarted())
+//            .andExpect(request().asyncResult(expectedResult))
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+
+        this.mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().string(expectedResult));
+    }
 }
